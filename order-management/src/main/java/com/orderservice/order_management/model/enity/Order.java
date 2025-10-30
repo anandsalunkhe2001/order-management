@@ -1,5 +1,6 @@
 package com.orderservice.order_management.model.enity;
 
+import java.time.LocalDateTime;
 import com.orderservice.order_management.model.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class Order {
     private OrderStatus status;
 
     private BigDecimal totalAmount;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
@@ -63,7 +65,7 @@ public class Order {
      * Private method to calculate total order amount
      * This is internal business logic of the aggregate
      */
-    private void calculateTotalAmount() {
+    public void calculateTotalAmount() {
         this.totalAmount = this.items.stream()           // Stream through all items
                 .map(item -> item.getUnitPrice()             // Get unit price
                         .multiply(BigDecimal.valueOf(item.getQuantity()))) // Price × Quantity
