@@ -1,5 +1,6 @@
 package com.orderservice.order_management.service;
 
+import com.orderservice.order_management.exception.ResourceNotFoundException;
 import com.orderservice.order_management.model.dto.CustomerDTO;
 import com.orderservice.order_management.model.enity.Customer;
 import com.orderservice.order_management.repository.CustomerRepository;
@@ -26,7 +27,7 @@ public class CustomerService {
 
     public CustomerDTO getCustomerById(Long id) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
         return customerMapper.toCustomerDTO(customer);
     }
 
@@ -37,7 +38,7 @@ public class CustomerService {
     }
     public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
         Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
 
         // Update fields
         existingCustomer.setName(customerDTO.getName());
@@ -49,7 +50,14 @@ public class CustomerService {
 
     public void deleteCustomer(Long id) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
         customerRepository.delete(customer);
+    }
+
+    // NEW METHOD: Customer validation for other services
+    public void validateCustomerExists(Long customerId) {
+        if (!customerRepository.existsById(customerId)) {
+            throw new ResourceNotFoundException("Customer", "id", customerId);
+        }
     }
 }

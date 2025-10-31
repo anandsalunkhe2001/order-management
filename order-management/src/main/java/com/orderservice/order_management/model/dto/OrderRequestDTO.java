@@ -1,9 +1,9 @@
 package com.orderservice.order_management.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,6 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderRequestDTO {
 
+    @NotNull(message = "Customer Id is required")
     private Long customerId;
-    private List<OrderItemDTO> items;
+
+    @NotEmpty(message = "Order must contain at least one item")
+    private List<@Valid OrderItemDTO> items;
 }

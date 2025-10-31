@@ -1,8 +1,10 @@
 package com.orderservice.order_management.service;
 
 
+import com.orderservice.order_management.exception.ResourceNotFoundException;
 import com.orderservice.order_management.model.dto.OrderRequestDTO;
 import com.orderservice.order_management.model.dto.OrderResponseDTO;
+import com.orderservice.order_management.model.enity.Customer;
 import com.orderservice.order_management.model.enity.Order;
 import com.orderservice.order_management.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,14 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper; // Add mapper dependency
-
+    private final CustomerService customerService; // Inject CustomerService
 
 
     public OrderResponseDTO createOrder(OrderRequestDTO orderRequest) {
+
+        // Validate customer exists using CustomerService
+        customerService.validateCustomerExists(orderRequest.getCustomerId());
+
         // Convert DTO to Entity using mapper
         Order order = orderMapper.toOrderEntity(orderRequest);
 
@@ -38,7 +44,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public OrderResponseDTO getOrderById(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "id", id));
         return orderMapper.toDTO(order);
     }
 
